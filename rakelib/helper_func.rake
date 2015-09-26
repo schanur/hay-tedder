@@ -1,6 +1,7 @@
-def dep_file_valid(filename)
-  _file_ending = filename[-2]
-end
+# FIXME
+# def dep_file_valid(filename)
+#   _file_ending = filename[-2]
+# end
 
 # Parse the dependency file created by the compiler and return
 # a FileList containing the files of the dependency file.

@@ -1,10 +1,10 @@
 TEST_BUILD_DIR = 'build/var/test'
 
-c_unit_test_files                  = FileList['test/unit/*.c']
-c_unit_test_dep_job                = c_unit_test_files.gsub(/\//, '#').sub(/test\#unit\#/, TEST_BUILD_DIR + '/' + $opt['target'] + '/').sub(/\.c$/, '.test_dep')
-c_unit_test_run_list               = FileList.new
-c_unit_test_result_list_native     = c_unit_test_dep_job.sub('.test_dep', '.result_native')
-c_unit_test_result_list_valgrind   = c_unit_test_dep_job.sub('.test_dep', '.result_valgrind')
+# c_unit_test_files                  = FileList['test/unit/*.c']
+# c_unit_test_dep_job                = c_unit_test_files.gsub(/\//, '#').sub(/test\#unit\#/, TEST_BUILD_DIR + '/' + $opt['target'] + '/').sub(/\.c$/, '.test_dep')
+# c_unit_test_run_list               = FileList.new
+# c_unit_test_result_list_native     = c_unit_test_dep_job.sub('.test_dep', '.result_native')
+# c_unit_test_result_list_valgrind   = c_unit_test_dep_job.sub('.test_dep', '.result_valgrind')
 
 #c_unit_test_vendor_file_relaltions = {
 
@@ -49,9 +49,9 @@ end
 #task      :link_c_test              => [:compile_c_obj_list, :link_with_dependencies, :run_c_tests, :verify_all_tests_has_run]
 #task      :link_c_test              => [:compile_c_obj_list, :link_with_dependencies, :run_c_tests_native, :run_c_tests_valgrind]
 task      :link_c_test              => [:compile_c_obj_list, :link_with_dependencies, :run_c_tests_native]
-multitask :compile_c_obj_list       => c_unit_test_dep_job
-#multitask :run_c_tests_native       => c_unit_test_result_list_native
-task      :run_c_tests_native       => c_unit_test_result_list_native
+# multitask :compile_c_obj_list       => c_unit_test_dep_job
+# #multitask :run_c_tests_native       => c_unit_test_result_list_native
+# task      :run_c_tests_native       => c_unit_test_result_list_native
 #multitask :run_c_tests_valgrind     => c_unit_test_result_list_valgrind
 #multitask :run_c_tests              =>
 # multitask :verify_all_tests_has_run => c_unit_test_result_list

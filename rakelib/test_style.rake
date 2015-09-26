@@ -1,9 +1,7 @@
-style_test_sub_dir               = $opt['build_dir'] + '/' + 'var/style'
-
-# c_source
-
-style_test_script_list           = FileList['test/style/*']
-style_test_symbol_list           = style_test_script_list.sub('.sh', '').sub('test/style/', '').map{ |script_name| script_name.to_sym() }
+# style_test_sub_dir               = $opt['build_dir'] + '/' + 'var/style'
+# # c_source
+# style_test_script_list           = FileList['test/style/*']
+# style_test_symbol_list           = style_test_script_list.sub('.sh', '').sub('test/style/', '').map{ |script_name| script_name.to_sym() }
 
 
 
