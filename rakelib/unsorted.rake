@@ -13,7 +13,7 @@ parse_cmd_params($opt)
 # puts RUBY_VERSION
 # exit 1
 
-task      :default         => [:help]
+# task      :default         => [:help]
 
 desc 'Build all software components'
 task      :build,           [:opt] do |t, args|
