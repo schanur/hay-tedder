@@ -8,7 +8,7 @@
 # All allowed values for all options
 $allowed_options  = {
   'target'           => ['release', 'debug', 'coverage', 'profile'],
-  'c_compiler'       => ['clang',   'gcc',   'colorgcc', 'x86_64-w64-mingw32-gcc', 'i686-w64-mingw32-gcc', 'x86_64-w64-mingw32-gcc-win32', 'i686-w64-mingw32-gcc-win32'],
+  'c_compiler'       => ['clang',   'gcc',   'colorgcc', 'x86_64-w64-mingw32-gcc', 'i686-w64-mingw32-gcc', 'x86_64-w64-mingw32-gcc-win32', 'i686-w64-mingw32-gcc-win32', 'avr-gcc'],
   'verbose_cmd'      => ['no',      'yes'],
   'dry_run'          => ['no',      'yes'],
   # 'break_on_warning' => ['no',      'yes'],
@@ -31,14 +31,15 @@ $warnings = {
   'x86_64-w64-mingw32-gcc'       => ' -Wall -std=c11',
   'i686-w64-mingw32-gcc'         => ' -Wall -std=c11',
   'x86_64-w64-mingw32-gcc-win32' => ' -Wall -std=c11',
-  'i686-w64-mingw32-gcc-win32'   => ' -Wall -std=c11'
+  'i686-w64-mingw32-gcc-win32'   => ' -Wall -std=c11',
+  'avr-gcc'                      => ' -Wall -std=c11',
   #  'gcc'   => '-Wall -Werror'
 }
 
 def get_target_platform_by_c_compiler(compiler)
   target_platform = nil
   compiler_by_platform = {
-    :posix   => ['clang', 'gcc', 'colorgcc'],
+    :posix   => ['clang', 'gcc', 'colorgcc', 'avr-gcc'],
     :windows => ['x86_64-w64-mingw32-gcc', 'i686-w64-mingw32-gcc', 'x86_64-w64-mingw32-gcc-win32', 'i686-w64-mingw32-gcc-win32']
   }
   compiler_by_platform.each do |platform, compiler_list|
