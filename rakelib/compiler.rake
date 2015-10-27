@@ -23,13 +23,13 @@
 #                                 ),
 #                   :gcc   =>
 #                   CCompiler.new('gcc',
-#                                 '-Wall -Werror'                                
+#                                 '-Wall -Werror'
 #                                 )
 #                  ]
 
 # C_COMPILER       = 'clang'
 
-C_INCLUDE        = "-Isrc -Isrc/extern/platform/src"
+# C_INCLUDE        = "-Isrc -Isrc/extern/platform/src"
 # #C_LINK_LIBS      = "-lm -lGL -lglfw -OpenCL"
 # C_LINK_SDL2_LIBS = "-L/usr/local/lib -lSDL2 -Wl,-rpath=/usr/local/lib"
 # C_LINK_LIBS      = "-lm -lGL -OpenCL " + C_LINK_SDL2_LIBS

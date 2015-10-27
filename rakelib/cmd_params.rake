@@ -39,8 +39,9 @@ $warnings = {
 def get_target_platform_by_c_compiler(compiler)
   target_platform = nil
   compiler_by_platform = {
-    :posix   => ['clang', 'gcc', 'colorgcc', 'avr-gcc'],
-    :windows => ['x86_64-w64-mingw32-gcc', 'i686-w64-mingw32-gcc', 'x86_64-w64-mingw32-gcc-win32', 'i686-w64-mingw32-gcc-win32']
+    :posix   => ['clang', 'gcc', 'colorgcc'],
+    :windows => ['x86_64-w64-mingw32-gcc', 'i686-w64-mingw32-gcc', 'x86_64-w64-mingw32-gcc-win32', 'i686-w64-mingw32-gcc-win32'],
+    :avr     => ['avr-gcc']
   }
   compiler_by_platform.each do |platform, compiler_list|
     if compiler_list.include?(compiler)
@@ -56,6 +57,11 @@ def generate_c_code_gen_options(target, compiler)
   code_gen_opt = Hash.new
 
   case target.to_sym
+  when :embedded
+    code_gen_opt[:optimization]     = '-Os -DNDEBUG'
+    code_gen_opt[:optimization_hot] = '-O3 -DNDEBUG'
+    code_gen_opt[:compile]          = ''
+    code_gen_opt[:link]             = ''
   when :release
     # -ffast-math -fno-math-errno -funsafe-math-optimizations -fassociative-math -freciprocal-math -ffinite-math-only -fno-signed-zeros -fno-trapping-math
     code_gen_opt[:optimization]     = '-Os -DNDEBUG'
@@ -134,7 +140,7 @@ def post_validate_values(opt)
   if opt['build_root'][-1] == '/'
     opt['build_root'] = opt['build_root'][0..-2]
   end
-  opt['build_dir'] = opt['build_root'] + '/' + opt['target']
+  opt['build_dir'] = File.join(opt['build_root'], opt['target'])
 
   # Set the optimizing options/debug options depending on the
   # target and compiler.
@@ -151,8 +157,8 @@ def post_validate_values(opt)
   # TODO: Windows hack
   opt['c_link_path']          = '' #' -L/usr/local/lib'
   # TODO: Windows hack
-  opt['c_link_lib']           = '' '  -lSDL2main -lSDL2'
-  opt['c_link_lib_check']     = ''
+  # opt['c_link_lib']           = '' '  -lSDL2main -lSDL2'
+  # opt['c_link_lib_check']     = ''
 
   # opt['c_include_path']    += ' -Ivendor/sdl2_dev_mingw/version/x86_64-w64-mingw32/include'
   # # opt['c_link_path']     += ' -Lvendor/sdl2_dev_mingw/version/lib/x64'
@@ -164,12 +170,12 @@ def post_validate_values(opt)
 
   target_platform = get_target_platform_by_c_compiler(opt['c_compiler'])
   if    target_platform == :posix
-    opt['c_link_lib']        += ' -lm -lpthread -lSDL2main -lSDL2 -lrt -lX11'
+    opt['c_link_lib']         = ' -lm -lpthread -lSDL2main -lSDL2 -lrt -lX11'
     opt['c_link_lib_check']   = ''
 
   elsif target_platform == :windows
     # opt['c_link_lib']      += ' -lwsock32 -lpthread -lSDL2main'
-    opt['c_link_lib']        += ' -lwsock32 -lpthread -mwindows -lmingw32 -lSDL2main -lSDL2 -lopengl32'
+    opt['c_link_lib']         = ' -lwsock32 -lpthread -mwindows -lmingw32 -lSDL2main -lSDL2 -lopengl32'
     # opt['c_link_lib']      += ' -lwsock32 -lpthread -lSDL2main -lSDL2 -lopengl32'
 
     # Windows check unit testing framework.
@@ -180,6 +186,11 @@ def post_validate_values(opt)
     # Windows SDL2
     opt['c_include_path']    += ' -Ivendor/sdl2_dev_mingw/version/i686-w64-mingw32/include'
     opt['c_link_path']       += ' -Lvendor/sdl2_dev_mingw/version/i686-w64-mingw32/lib'
+
+  elsif target_platform == :avr
+    opt['c_link_lib']         = ''
+    opt['c_link_lib_check']   = ''
+
 
   else
     raise 'Target platform not handled properly.'
