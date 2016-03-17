@@ -22,7 +22,7 @@ $allowed_options  = {
 #   :build_root  => [:build,   :all_values_allowed]
 # }
 
-$allowed_tasks   = ['default', 'build', 'c_modules', 'link' , 'autotest', 'rsync']
+$allowed_tasks = ['default', 'build', 'c_modules', 'link' , 'autotest', 'rsync']
 
 $warnings = {
   'clang'                        => ' -Weverything -Wno-padded -Wno-missing-noreturn -Wno-disabled-macro-expansion -Wno-empty-translation-unit -Wno-format-security -Wno-format-nonliteral',
@@ -109,19 +109,43 @@ def parse_task()
   return task
 end
 
+def is_allowed_option(key)
+  return $allowed_options.key?(key)
+end
+
+def is_allowed_option_value(key, value)
+  raise 'Invalid key' + key unless $allowed_options.key?(key)
+  return false unless $allowed_options[key].include?(value) or $allowed_options[key].include?(:all_values_allowed)
+
+  return true
+end
+
 def parse_options(opt)
   opts = ARGV.select {|arg| arg.include?("=") == true}
   opts.each do |option|
-    raise 'Invalid option sytax: ' + option + '.' if     option.count('=') != 1 # Argument is of form "$string1=$string2=$string3"
+    raise 'Invalid option sytax: '       + option if     option.count('=') != 1 # Argument is of form "$string1=$string2=$string3"
     key, value = option.split('=')
     raise 'Option or value is empty string.'      if     key == nil or value == nil # Check for the invalid strings '=$STRING' '$STRING=' and '='
-    raise 'Invalid option found: ' + key + '.'    unless $allowed_options.key?(key)
-    raise 'Invalid option value found: ' + value  unless $allowed_options[key].include?(value) or $allowed_options[key].include?(:all_values_allowed)
+    raise 'Invalid option found: '       + key    unless is_allowed_option(key)
+    raise 'Invalid option value found: ' + value  unless is_allowed_option_value(key, value)
     opt[key] = value
   end
 end
 
-def set_empty_to_default(opt)
+def set_empty_to_user_default(opt)
+  $default_options.each do |key, value|
+    raise 'invalid option found in configuration file: $default_options: option: ' + key   unless is_allowed_option(key)
+    raise 'invalid option found in configuration file: $default_options: value: '  + value unless is_allowed_option_value(key, value)
+
+    if not opt.include?(key)
+      # Use first value in the list of allowed
+      # values as default value.
+      opt[key] = $allowed_options[key][0]
+    end
+  end
+end
+
+def set_empty_to_rake_default(opt)
   $allowed_options.keys.each do |option|
     if not opt.include?(option)
       # Use first value in the list of allowed
@@ -202,7 +226,8 @@ end
 def parse_cmd_params(opt)
   parse_task()
   parse_options(opt)
-  set_empty_to_default(opt)
+  set_empty_to_user_default(opt)
+  set_empty_to_rake_default(opt)
   post_validate_values(opt)
 end
 
