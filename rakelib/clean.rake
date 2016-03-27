@@ -63,7 +63,7 @@ multitask :clean_all,                  [:opt] do |t, args|
   Rake::Task[:clean_valgrind_suppression ].invoke(args[:opt])
 end
 
-desc 'Clean build directory'
+desc 'Clean build/target directory'
 multitask :clean_build,                [:opt] do |t, args|
   args.with_defaults(:opt => default_options()) if args[:opt].nil?
   Rake::Task[:clean_c_dep                ].invoke(args[:opt])
