@@ -1,3 +1,4 @@
+desc 'Print a list of allowed tasks and options'
 task :help do
   puts ''
   puts 'Tasks:'

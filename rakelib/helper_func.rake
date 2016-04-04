@@ -98,29 +98,29 @@ end
 
 
 # FIXME: Is part of recursive rake task execution.
-def recursive_rake_call(task, target, build_root, opt)
-  # MinGW needs a lot of RAM while compiling duo to parsing windows.h.
-  # To reduce swapping reduce number of threads.
-  # FIXME: Find a better way to determine the best number of threads.
-  if get_target_platform_by_c_compiler($opt['c_compiler']) == :windows
-    # thread_cnt = jobs_param()
-    jobs_param = '--jobs=1'
-  else
-    jobs_param = ''
-  end
-  _cmd_str = "rake #{jobs_param} #{task} build_root=#{build_root} target=#{target} c_compiler=#{opt['c_compiler']} verbose_cmd=#{opt['verbose_cmd']}"
+# def recursive_rake_call(task, target, build_root, opt)
+#   # MinGW needs a lot of RAM while compiling duo to parsing windows.h.
+#   # To reduce swapping reduce number of threads.
+#   # FIXME: Find a better way to determine the best number of threads.
+#   if get_target_platform_by_c_compiler($opt['c_compiler']) == :windows
+#     # thread_cnt = jobs_param()
+#     jobs_param = '--jobs=1'
+#   else
+#     jobs_param = ''
+#   end
+#   _cmd_str = "rake #{jobs_param} #{task} build_root=#{build_root} target=#{target} c_compiler=#{opt['c_compiler']} verbose_cmd=#{opt['verbose_cmd']}"
 
-  rake_system(_cmd_str)
-end
+#   rake_system(_cmd_str)
+# end
 
 # FIXME: Is part of recursive rake task execution.
-def split_recursive_rake_arguments(task_name)
-  task_name = task_name.sub('test_recursive_', '')
-  _args = Hash.new
-  _args[:target] = task_name.split('_')[-1]
-  _args[:task]   = task_name.sub('_' + _args[:target], '')
-  return _args
-end
+# def split_recursive_rake_arguments(task_name)
+#   task_name = task_name.sub('test_recursive_', '')
+#   _args = Hash.new
+#   _args[:target] = task_name.split('_')[-1]
+#   _args[:task]   = task_name.sub('_' + _args[:target], '')
+#   return _args
+# end
 
 def run_cmd_loop_on_inotify_event()
   # $(AUTO_BUILD_PRIORITY_CMD)

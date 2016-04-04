@@ -1,6 +1,8 @@
+require 'awesome_print'
+
 TEST_BUILD_DIR = 'build/var/test'
 
-# c_unit_test_files                  = FileList['test/unit/*.c']
+c_unit_test_files                  = FileList['test/unit/*.c']
 # c_unit_test_dep_job                = c_unit_test_files.gsub(/\//, '#').sub(/test\#unit\#/, TEST_BUILD_DIR + '/' + $opt['target'] + '/').sub(/\.c$/, '.test_dep')
 # c_unit_test_run_list               = FileList.new
 # c_unit_test_result_list_native     = c_unit_test_dep_job.sub('.test_dep', '.result_native')
@@ -8,15 +10,40 @@ TEST_BUILD_DIR = 'build/var/test'
 
 #c_unit_test_vendor_file_relaltions = {
 
-#desc 'Run a list of unit tests'
-#task      :test, [:arg]         => [:test_run_test_list[:arg],         :test_unit_test_list]
-#task      :test_unit_test_list  => [:test_c_obj,                       :test_link]
-task      :test                 => [:test_unit_test_list]
+task      :test,                 [:opt] do |t, args|
+  args.with_defaults(:opt => default_options()) if args[:opt].nil?
+  # args[:opt]
+  # puts args[:opt]['target']
+
+  # Override target directory.
+  test_c_obj_args = args[:opt].merge({ 'build_dir' => File.join(args[:opt]['build_root'], 'var/test', args[:opt]['target']) })
+  # ap(args[:opt])
+  # ap(test_c_obj_args)
+  # ap(task_list)
+  # ap(c_dep_job_file_list())
+  # ap args[:opt]['build_dir']
+  ap test_c_obj_args['build_dir']
+  # exit 1
+
+  task_list = task_list_with_options(c_dep_job_file_list().map { |file| File.join(test_c_obj_args['build_dir'], file) }, test_c_obj_args)
+  ap 'Task list'
+  ap(task_list)
+  parallel_invoke(task_list, test_c_obj_args)
+
+end
+
+# task      :test                 => [:test_unit_test_list]
 task      :test_unit_test_list  => [:test_c_obj,                       :test_link]
-#task      :test                 => [:test_c_obj,                       :test_link]
 multitask :test_c_obj           => [:test_recursive_c_obj_debug,       :test_recursive_c_obj_release      ]
 multitask :test_clean           => [:test_recursive_clean_release,     :test_recursive_clean_debug        ]
 multitask :test_link            => [:test_recursive_link_c_test_debug, :test_recursive_link_c_test_release]
+
+#desc 'Run a list of unit tests'
+#task      :test, [:arg]         => [:test_run_test_list[:arg],         :test_unit_test_list]
+#task      :test_unit_test_list  => [:test_c_obj,                       :test_link]
+
+
+#task      :test                 => [:test_c_obj,                       :test_link]
 # multitask :test_c_obj           => [:test_recursive_c_obj_debug,       :test_recursive_c_obj_release,       :test_recursive_c_obj_coverage]
 # multitask :test_clean           => [:test_recursive_clean_debug,       :test_recursive_clean_release,       :test_recursive_clean_coverage]
 # multitask :test_link            => [:test_recursive_link_c_test_debug, :test_recursive_link_c_test_release, :test_recursive_link_c_test_coverage]
@@ -41,14 +68,15 @@ multitask :test_link            => [:test_recursive_link_c_test_debug, :test_rec
 #   delete_file_if_exists('build/vendor/unity.o', $opt)
 # end
 
-rule /^test_recursive/ do |t|
-  _args = split_recursive_rake_arguments(t.name)
-  recursive_rake_call(_args[:task], _args[:target], TEST_BUILD_DIR, $opt)
-end
+# rule /^test_recursive/ do |t|
+#   _args = split_recursive_rake_arguments(t.name)
+#   recursive_rake_call(_args[:task], _args[:target], TEST_BUILD_DIR, $opt)
+# end
 
 #task      :link_c_test              => [:compile_c_obj_list, :link_with_dependencies, :run_c_tests, :verify_all_tests_has_run]
 #task      :link_c_test              => [:compile_c_obj_list, :link_with_dependencies, :run_c_tests_native, :run_c_tests_valgrind]
-task      :link_c_test              => [:compile_c_obj_list, :link_with_dependencies, :run_c_tests_native]
+# task      :link_c_test              => [:compile_c_obj_list, :link_with_dependencies, :run_c_tests_native]
+task      :link_c_test              => [:c_obj, :link_with_dependencies, :run_c_tests_native]
 # multitask :compile_c_obj_list       => c_unit_test_dep_job
 # #multitask :run_c_tests_native       => c_unit_test_result_list_native
 # task      :run_c_tests_native       => c_unit_test_result_list_native
@@ -84,6 +112,7 @@ rule( /\.result_valgrind$/ => [proc {|task_name| task_name.sub('.result_valgrind
   touch t.name
 end
 
+
 task :link_with_dependencies do
   c_unit_test_run_list.each do |test|
     _binary = test.sub('.o', '')
@@ -99,8 +128,10 @@ task :link_with_dependencies do
   end
 end
 
-# We do not use this rule to actually build '. deb' files.
-rule /\.test_dep$/ do |t|
+# We do not use this rule to actually build '.test_deb' files.
+rule /\.test_dep$/ do |t, args|
+  # args.with_defaults(:opt => default_options()) if args[:opt].nil?
+
   _dep_filename = t.name.sub('.test_dep', '.d')
   _obj_filename = t.name.sub('.test_dep', '.o')
   _c_filename   = t.name.sub('.test_dep', '.c')
@@ -108,6 +139,7 @@ rule /\.test_dep$/ do |t|
   # rebuild the '.d' file.
   file _dep_filename
   Rake::Task[_dep_filename].invoke
+
   _test_dep_file_list        = comp_test_dep_2_filelist(_dep_filename).add(build_to_test_src_file($opt['build_dir'], _c_filename))
   _test_dep_header_file_list = _test_dep_file_list.select { |c_file| c_file.include?('.c') }
   _test_dep_file_list.each do |t|

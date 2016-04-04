@@ -15,7 +15,10 @@ def task_list_with_options(task_list, *opt_list)
                      + '__rand:' + rand_task_string \
                      + '__type:' + task_item.class.to_s \
                      + '__name:' + task_item.to_s
+    # task meta_task_name, [*opt_list] do
     task meta_task_name do
+      ap "meta_task_opt_list"
+      ap *opt_list
       Rake::Task[task_item].invoke(*opt_list)
     end
     meta_task_list.push(meta_task_name)
@@ -23,8 +26,9 @@ def task_list_with_options(task_list, *opt_list)
   return meta_task_list
 end
 
-def parallel_invoke(task_list)
+def parallel_invoke(task_list, opt)
   rand_task = rand_task_symbol()
   multitask  rand_task => task_list
-  Rake::Task[rand_task].invoke
+  # Rake::Task[rand_task].invoke(opt)
+  Rake::Task[rand_task].invoke(1)
 end

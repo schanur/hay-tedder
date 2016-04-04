@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 require 'rake'
+require 'awesome_print'
 #require 'rake/clean'
 
 load('rakelib/cmd_params.rake')
@@ -20,16 +21,23 @@ parse_cmd_params($opt)
 
 desc 'Link binary, shared library and static library'
 # multitask :link            => [:link_binary, :link_static_lib, :link_shared_lib]
-task      :link,           [:opt] do |t, args|
+task      :link,                  [:opt] do |t, args|
   args.with_defaults(:opt => default_options()) if args[:opt].nil?
+
   parallel_invoke(task_list_with_options([:link_binary, :link_static_lib, :link_shared_lib], args[:opt]))
 end
 
 desc 'Compile all C modules'
 # multitask :c_obj           => c_dep_job
-task      :c_obj,           [:opt] do |t, args|
+task      :c_obj,                 [:opt] do |t, args|
   args.with_defaults(:opt => default_options()) if args[:opt].nil?
-  parallel_invoke(task_list_with_options(c_dep_job_file_list().map { |file| File.join(args[:opt]['build_dir'], file) }, args[:opt]))
+  ap(c_dep_job_file_list())
+  # exit 1
+
+  task_list = task_list_with_options(c_dep_job_file_list().map { |file| File.join(args[:opt]['build_dir'], file) }, args[:opt])
+  ap task_list
+  parallel_invoke(task_list)
+  # parallel_invoke(task_list_with_options(c_dep_job_file_list().map { |file| File.join(args[:opt]['build_dir'], file) }, args[:opt]))
 end
 
 desc 'Link binaries'
@@ -49,14 +57,19 @@ end
 
 
 # We do not use this rule to actually build '.dep' files.
-rule /\.dep$/ do |t, args|
+rule /\.dep$/, [:opt] do |t, args|
+  ap ".dep rule"
   _opt = args.opt
   _dep_filename = t.name.sub('.dep', '.d')
   _obj_filename = t.name.sub('.dep', '.o').sub('c_dep', 'c_obj')
   # If the C source file is newer than the '.d' file
   # rebuild the '.d' file.
   file _dep_filename
-  Rake::Task[_dep_filename].invoke
+  ap args[:opt]
+  ap _opt
+  # sa
+  exit 1
+  Rake::Task[_dep_filename].invoke(args[:opt])
   # We have a valid and actual '.d' file. Invoke the
   # object file rule with the dependencies read from the '.d' file.
   file _obj_filename => comp_dep_2_filelist(_dep_filename) do |t|

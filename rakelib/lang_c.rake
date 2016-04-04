@@ -1,9 +1,30 @@
 
-# Build C dependency files.
-rule( /\.d$/ => [proc {|task_name| task_name.sub('.d', '.c').sub($opt['build_dir'] + '/c_dep/', 'src/').gsub('#', '/') }]) do |t|
-  compile_c_dependency_file(t.source, t.name, $opt)
-  #compile_c_dependency_file(t.source, t.name, $obj)
+# rule( /\.d$/, [:opt] => [proc {|task_name| task_name.sub('.d', '.c').sub(args[:opt]['build_dir'] + '/c_dep/', 'src/').gsub('#', '/') }]) do |t, args|
+
+rule /\.d$/, [:opt] do |t, args|
+  ap ".d rule"
+  ap t
+  ap args[:opt]
+  exit 1
+  task t => [task_name.sub('.d', '.c').sub(args[:opt]['build_dir'] + '/c_dep/', 'src/').gsub('#', '/')] do
+    Rake::Task[task_item].invoke(args[:opt])
+  end
 end
+
+
+
+# # Build C dependency files.
+# # task :name, [:first_name, :last_name] => [:pre_name] do |t, args|
+# rule( /\.d$/, [:opt] => [
+#         proc {|task_name, args| task_name.sub('.d', '.c').sub(args[:opt]['build_dir'] + '/c_dep/', 'src/').gsub('#', '/') }
+#       ]) do |t, args|
+#   ap 1
+# rule( /\.d$/ => [proc {|task_name| task_name.sub('.d', '.c').sub($opt['build_dir'] + '/c_dep/', 'src/').gsub('#', '/') }]) do |t, args|
+#   compile_c_dependency_file(t.source, t.name, args[:opt])
+#   # compile_c_dependency_file(t.source, t.name, $opt)
+#   #compile_c_dependency_file(t.source, t.name, $obj)
+# end
+
 
 # # Build binaries.
 # rule( /\.bin$/ => [proc {|task_name| task_name.sub('.d', '.c').sub($opt['build_dir'] + '/c_dep/', 'src/').gsub('#', '/') }]) do |t|

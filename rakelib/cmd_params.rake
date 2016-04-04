@@ -15,12 +15,6 @@ $allowed_options  = {
   'build_root'       => ['build',   :all_values_allowed],
   '-j'               => ['1', '8', '32']
 }
-# $allowed_options  = {
-#   :target      => [:release, :debug, :coverage, :profile],
-#   :c_compiler  => [:clang,   :gcc,   :colorgcc],
-#   :verbose_cmd => [:no,      :yes],
-#   :build_root  => [:build,   :all_values_allowed]
-# }
 
 $allowed_tasks = ['default', 'build', 'c_modules', 'link' , 'autotest', 'rsync']
 
@@ -109,10 +103,12 @@ def parse_task()
   return task
 end
 
+# Check if an option is available in the global allowed_options hash.
 def is_allowed_option(key)
   return $allowed_options.key?(key)
 end
 
+# Check if the option parameter "key" allowes the value "value".
 def is_allowed_option_value(key, value)
   raise 'Invalid key' + key unless $allowed_options.key?(key)
   return false unless $allowed_options[key].include?(value) or $allowed_options[key].include?(:all_values_allowed)
@@ -132,6 +128,7 @@ def parse_options(opt)
   end
 end
 
+#
 def set_empty_to_user_default(opt)
   $default_options.each do |key, value|
     raise 'invalid option found in configuration file: $default_options: option: ' + key   unless is_allowed_option(key)
