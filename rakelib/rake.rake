@@ -17,8 +17,8 @@ def task_list_with_options(task_list, *opt_list)
                      + '__name:' + task_item.to_s
     # task meta_task_name, [*opt_list] do
     task meta_task_name do
-      ap "meta_task_opt_list"
-      ap *opt_list
+      # ap "meta_task_opt_list"
+      # ap *opt_list
       Rake::Task[task_item].invoke(*opt_list)
     end
     meta_task_list.push(meta_task_name)

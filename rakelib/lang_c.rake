@@ -2,13 +2,15 @@
 # rule( /\.d$/, [:opt] => [proc {|task_name| task_name.sub('.d', '.c').sub(args[:opt]['build_dir'] + '/c_dep/', 'src/').gsub('#', '/') }]) do |t, args|
 
 rule /\.d$/, [:opt] do |t, args|
-  ap ".d rule"
+  _task_dependency = t.name.sub('.d', '.c').sub(args[:opt]['build_dir'] + '/c_dep/', 'src/').gsub('#', '/')
+  # ap ".d rule"
   ap t
-  ap args[:opt]
+  ap _task_dependency
   exit 1
-  task t => [task_name.sub('.d', '.c').sub(args[:opt]['build_dir'] + '/c_dep/', 'src/').gsub('#', '/')] do
-    Rake::Task[task_item].invoke(args[:opt])
-  end
+
+  # task t => [_task_dependency] do
+  #   Rake::Task[task_item].invoke(args[:opt])
+  # end
 end
 
 

@@ -22,12 +22,12 @@ task      :test,                 [:opt] do |t, args|
   # ap(task_list)
   # ap(c_dep_job_file_list())
   # ap args[:opt]['build_dir']
-  ap test_c_obj_args['build_dir']
+  # ap test_c_obj_args['build_dir']
   # exit 1
 
   task_list = task_list_with_options(c_dep_job_file_list().map { |file| File.join(test_c_obj_args['build_dir'], file) }, test_c_obj_args)
-  ap 'Task list'
-  ap(task_list)
+  # ap 'Task list'
+  # ap(task_list)
   parallel_invoke(task_list, test_c_obj_args)
 
 end
@@ -154,16 +154,16 @@ rule /\.test_dep$/ do |t, args|
   Rake::FileTask[_obj_filename].invoke
 end
 
-rule( /build\/var\/.*\.d$/ => [proc {|task_name| task_name.sub('.d', '.c').sub($opt['build_dir'] + '/', 'test/unit/').gsub('#', '/') }]) do |t|
-# The source parameter
-#rule /build\/var\/.*\.d$/, [:source] do |t, args|
-  #_source_file = args[:source]
-  _source_file = t.source
-  # puts $obj
-  # exit 1
-  compile_c_dependency_file(_source_file, t.name, $opt)
-  #puts "name: " + t.name + " source: " + _source_file
-end
+# rule( /build\/var\/.*\.d$/ => [proc {|task_name| task_name.sub('.d', '.c').sub($opt['build_dir'] + '/', 'test/unit/').gsub('#', '/') }]) do |t|
+# # The source parameter
+# #rule /build\/var\/.*\.d$/, [:source] do |t, args|
+#   #_source_file = args[:source]
+#   _source_file = t.source
+#   # puts $obj
+#   # exit 1
+#   compile_c_dependency_file(_source_file, t.name, $opt)
+#   #puts "name: " + t.name + " source: " + _source_file
+# end
 
 task :autotest do
   run_cmd_loop_on_inotify_event

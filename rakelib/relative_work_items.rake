@@ -7,7 +7,6 @@ $shared_lib        = $project_base_name + '.so'
 # Returns a FileList containing all C source files (no header).
 # Example list item transformation: src/octree/iterator.c
 def c_source_file_list()
-  puts FileList['src/**/*.c'].exclude('**/unittest/**').exclude('**/vendor/**')
   return FileList['src/**/*.c'].exclude('**/unittest/**').exclude('**/vendor/**')
 end
 
