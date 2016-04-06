@@ -40,14 +40,18 @@ end
 #   return build_dir + '/' + src_file.sub('src/', '').gsub('/', '#')
 # end
 
+#
 def build_to_src_file(build_dir, build_file)
-  return build_file.sub(build_dir + '/', 'src/').sub('c_obj', '').gsub('#', '/')
+  return build_file.sub(build_dir + '/', 'src/').sub('c_obj/', '').gsub('#', '/')
 end
 
+#
 def build_to_test_src_file(build_dir, build_file)
   return build_file.sub(build_dir + '/', 'test/unit/').gsub('#', '/')
 end
 
+# Returns the module name without file extension but with path under
+# "src/".  "build/release/src/array.d" => "array"
 def to_abs_module_name(build_dir, file_desc)
   return file_desc.sub(build_dir + '/', '').sub('src/', '').gsub('#', '/').sub('.d', '').sub('.c', '').sub('.o', '')
 end

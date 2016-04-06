@@ -69,12 +69,18 @@ rule /\.dep$/, [:opt] do |t, args|
   # sa
   # exit 1
   # Rake::Task[_dep_filename].invoke(2)
+
+
+
   Rake::Task[_dep_filename].invoke(args[:opt])
   # We have a valid and actual '.d' file. Invoke the
   # object file rule with the dependencies read from the '.d' file.
   file _obj_filename, [:opt] => comp_dep_2_filelist(_dep_filename) do |t, args|
-    _src_filename = build_to_src_file($opt['build_dir'], t.name).sub('.o', '.c')
-    compile_c_object_file(_src_filename, t.name, $opt)
+    _src_filename = build_to_src_file(args[:opt]['build_dir'], t.name).sub('.o', '.c')
+    # ap _src_filename
+    # ap t.name
+    # exit 1
+    compile_c_object_file(_src_filename, t.name, args[:opt])
   end
   Rake::Task[_obj_filename].invoke(args[:opt])
 end

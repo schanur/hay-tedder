@@ -2,11 +2,17 @@
 # rule( /\.d$/, [:opt] => [proc {|task_name| task_name.sub('.d', '.c').sub(args[:opt]['build_dir'] + '/c_dep/', 'src/').gsub('#', '/') }]) do |t, args|
 
 rule /\.d$/, [:opt] do |t, args|
-  _task_dependency = t.name.sub('.d', '.c').sub(args[:opt]['build_dir'] + '/c_dep/', 'src/').gsub('#', '/')
+  # _task_dependency = t.name.sub('.d', '.c').sub(args[:opt]['build_dir'] + '/c_dep/', 'src/').gsub('#', '/')
+  _src_file = t.name.sub('.d', '.c').sub(args[:opt]['build_dir'] + '/c_dep/', 'src/').gsub('#', '/')
   # ap ".d rule"
-  ap t
-  ap _task_dependency
-  exit 1
+  ap t.name
+  ap _src_file
+  # exit 1
+  # Rebuild dependency file if it does not exist or is older than source file.
+  if (not File.exists?(t.name)) or (File.stat(t.name).mtime < File.stat(_src_file).mtime)
+    compile_c_dependency_file(_src_file, t.name, args[:opt])
+  end
+
 
   # task t => [_task_dependency] do
   #   Rake::Task[task_item].invoke(args[:opt])
@@ -60,8 +66,10 @@ end
 
 def compile_c_object_file(src_file, obj_file, opt)
   create_directory_of_file_if_missing(obj_file)
-  run_sh_cmd_formatted_with_target("#{$opt['c_compiler']} #{opt['c_code_gen'][:compile]} #{opt['c_code_gen'][:optimization]} #{opt['c_warnings']} #{$opt['c_include_path']} -c " + src_file + " -o #{obj_file}",
-                                   'CC', to_abs_module_name($opt['build_dir'], obj_file), opt['target'], opt['verbose_cmd'], opt['dry_run'])
+  sh_command = "#{$opt['c_compiler']} #{opt['c_code_gen'][:compile]} #{opt['c_code_gen'][:optimization]} #{opt['c_warnings']} #{$opt['c_include_path']} -c " + src_file + " -o #{obj_file}"
+  # ap sh_command
+  # exit 1
+  run_sh_cmd_formatted_with_target(sh_command, 'CC', to_abs_module_name($opt['build_dir'], obj_file), opt['target'], opt['verbose_cmd'], opt['dry_run'])
 end
 
 def compile_c_binary(binary, opt)
