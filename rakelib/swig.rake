@@ -23,7 +23,7 @@ end
 def swig_compile_python_wrapper(out_file, wrapper_source_file, opt)
   # TODO: remove with link flags from cmd_param.rake. ??
   # sh "gcc -c -fPIC #{wrapper_source_file} -I/usr/include/python3.4 -I/usr/include/tcl -I. -Isrc -Isrc/extern/platform/src -ltcl -lm -lSDL2 -lSDL2main -o #{out_file}"
-  sh "gcc -c -fPIC #{wrapper_source_file} -I/usr/include/python3.4 -I/usr/include/tcl -I. -Isrc -Isrc/extern/platform/src -o #{out_file}"
+  sh "gcc -c -fPIC #{wrapper_source_file} -I/usr/include/python3.4 -I/usr/include/tcl -I. #{c_compiler_include} -o #{out_file}"
   # sh "gcc -shared #{wrapper_source_file} -I/usr/include/python3.4 -I/usr/include/tcl -I. -Isrc -Isrc/extern/platform/src -o #{out_file}"
 end
 

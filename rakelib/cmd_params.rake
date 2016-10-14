@@ -172,7 +172,7 @@ def post_validate_values(opt)
   # Set the C compiler warning flags based on the compiler.
   opt['c_warnings']           = $warnings[opt['c_compiler']]
   # Set the C compiler include paths.
-  opt['c_include_path']       = '-Isrc -Isrc/extern/platform/src'
+  opt['c_include_path']       = $c_compiler_include
   # Set the C compiler libraries to link.
   #opt['c_link'] = '-lm -lGL -lglfw -OpenCL'
   # opt['c_link']          = '-lpthread -lm -lGL -lOpenCL -L/usr/local/lib -lSDL2'
